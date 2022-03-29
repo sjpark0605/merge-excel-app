@@ -15,8 +15,6 @@ const localization = {
 
 function MultiFieldSelect(props) {
 
-    const [selected, setSelected] = useState([])
-
     const options = []
 
     props.headers.forEach((option) => {options.push({label: option, value: option})})
@@ -32,10 +30,10 @@ function MultiFieldSelect(props) {
             <label className="form-label">엑셀 2에서 가져올 열</label>
             <MultiSelect 
                 options={options}
-                value={selected}
+                value={props.appendList}
                 disableSearch={true}
                 overrideStrings={localization}
-                onChange={setSelected}
+                onChange={props.setAppendList}
                 disabled={options.length === 0}
             />
         </div>

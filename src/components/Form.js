@@ -2,35 +2,48 @@ import { useState, useEffect } from 'react'
 import ExcelField from './ExcelField'
 import CommonFieldSelect from './CommonFieldSelect'
 import MultiFieldSelect from './MultiFieldSelect'
+import { filterExcel } from '../utils/helper'
 
 function Form() {
-    const [excelData1, setExcelData1] = useState({header: [], values: []});
-    const [excelData2, setExcelData2] = useState({header: [], values: []});
+    const [excel1JSON, setExcel1JSON] = useState({header: [], values: []});
+    const [excel2JSON, setExcel2JSON] = useState({header: [], values: []});
     const [commonHeader, setCommonHeader] = useState([]);
+    const [comparator, setComparator] = useState("");
+    const [appendList, setAppendList] = useState([]);
 
     useEffect(() => {
-        const intersection = excelData1["header"].filter(value => excelData2["header"].includes(value));
+        const intersection = excel1JSON["header"].filter(value => excel2JSON["header"].includes(value));
         setCommonHeader(intersection);
-        console.log(intersection)
-    }, [excelData1, excelData2])
+    }, [excel1JSON, excel2JSON])
+
+    const onSubmitClick = (event) => {
+        const appendTargetList = []
+
+        for (let i = 0; i < appendList.length; i++) {
+            appendTargetList.push(appendList[i]["value"])
+        }
+
+        const result = filterExcel(excel1JSON, excel2JSON, comparator, appendTargetList)
+        console.log(result)
+    }
 
     return (
         <div className="from-section">
             <form className="row g-3">
                 <div className="col-xs-12 col-lg-6">
-                    <ExcelField id={1} setExcelData={setExcelData1}/>
+                    <ExcelField id={1} setExcelJSON={setExcel1JSON}/>
                 </div>
                 <div className="col-xs-12 col-lg-6">
-                    <ExcelField id={2} setExcelData={setExcelData2}/>
+                    <ExcelField id={2} setExcelJSON={setExcel2JSON}/>
                 </div>
                 <div className="col-xs-12 col-lg-6">
-                    <CommonFieldSelect options={commonHeader}/>
+                    <CommonFieldSelect options={commonHeader} setComparator={setComparator}/>
                 </div>
                 <div className="col-xs-12 col-lg-6">
-                    <MultiFieldSelect headers={excelData2["header"]}/>
+                    <MultiFieldSelect headers={excel2JSON["header"]} appendList={appendList} setAppendList={setAppendList}/>
                 </div>
                 <div className="col-12">
-                    <button type="submit" className="btn btn-primary">병합</button>
+                    <button type="button" onClick={onSubmitClick} className="btn btn-primary">병합</button>
                 </div>
             </form>
         </div>

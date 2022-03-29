@@ -4,7 +4,7 @@ function ExcelField(props) {
 
     const onFileUpload = (event) => {
         excelToJSON(event).then((data) => {
-            props.setExcelData(data)
+            props.setExcelJSON(data)
         });
     }
 
