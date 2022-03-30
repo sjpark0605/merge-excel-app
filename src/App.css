@@ -32,6 +32,20 @@
 .App-link {
   color: #61dafb;
 }
+  
+#tableDiv {
+  height: 500px;
+  overflow: auto;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#downloadButtonWrapper {
+  text-align: right;
+}
 
 @keyframes App-logo-spin {
   from {

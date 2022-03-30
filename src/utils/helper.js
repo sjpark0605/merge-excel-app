@@ -17,8 +17,6 @@ export async function excelToJSON(event) {
 }
 
 function parseData(header, data) {
-    console.log(data[0][0])
-
     const result = {}
 
     for (let i = 0; i < header.length; i++) {
@@ -27,56 +25,53 @@ function parseData(header, data) {
 
     for (let r = 0; r < data.length; r++) {
         for (let c = 0; c < header.length; c++) {
-            result[header[c]].push(data[r][c])
+            const value = data[r][c] === null ? "" : String(data[r][c])
+            result[header[c]].push(value)
         }
     }
 
     return result;
 }
 
-export function filterExcel(excel1JSON, excel2JSON, comparator, appendList) {
+export function filterExcel(excel1JSON, excel2JSON, comparator, newHeaders) {
+    const result = [combineHeaders(excel1JSON["header"], newHeaders)]
+
+    const excel1Data = excel1JSON["values"]
+    const excel2Data = excel2JSON["values"]
+
+    const excel1DataLen = excel1Data[comparator].length
+
+    const targetList = excel1Data[comparator]
+
+    for (let i = 0; i < excel1DataLen; i++) {
+        const row = []
+        excel1JSON["header"].forEach((header) => {row.push(excel1Data[header][i])})
+        const index = excel2Data[comparator].indexOf(targetList[i])
+        if (index === -1 || targetList[i] === "") {
+            newHeaders.forEach((header) => {row.push("일치하는 값 없음")})
+        } else {
+            newHeaders.forEach((header) => {row.push(excel2Data[header][index])})
+        }
+        result.push(row)
+    }
+
+    return result
+}
+
+function combineHeaders(excel1HeaderList, newHeaderList) {
     const result = []
 
-    const newHeader = excel1JSON["header"]
+    excel1HeaderList.forEach((field) => {result.push(field)})
+    newHeaderList.forEach((field) => {result.push(field)})
 
-    for (let i = 0; i < excel1JSON["header"].length; i++) {
-        newHeader.push(excel1JSON["header"][i])
-    }
-
-    for (let i = 0; i < appendList; i++) {
-        newHeader.push(appendList[i])
-    }
-
-    result.push(newHeader)
-
-    for (let i = 0; i < excel1JSON["values"][comparator].length; i++) {
-        const data = []
-
-        const target = excel2JSON["values"][comparator].indexOf(excel1JSON["values"][comparator][i])
-
-        console.log(target)
-
-        for (let j = 0; j < excel1JSON["header"].length; j++) {
-            data.push(excel1JSON["values"][excel1JSON["header"][j]][i])
-        }
-
-        if (target !== -1) {
-            for (let j = 0; j < appendList.length; j++) {
-                data.push(excel2JSON["values"][appendList[j]][target])
-            }
-        }
-
-        result.push(data)
-    }
-
-    return result;
+    return result
 }
 
-function createExcel(parsedOutput, excelName) {
+export function createExcel(parsedOutput) {
     const workbook = utils.book_new();
     const worksheet = utils.aoa_to_sheet(parsedOutput);
 
     utils.book_append_sheet(workbook, worksheet)
 
-    writeFile(workbook, excelName + ".xlsx")
+    writeFile(workbook, "병합된 엑셀.xlsx")
 }

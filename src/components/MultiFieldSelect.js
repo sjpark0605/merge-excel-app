@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { MultiSelect } from "react-multi-select-component"
 
 const localization = {
@@ -17,7 +15,13 @@ function MultiFieldSelect(props) {
 
     const options = []
 
-    props.headers.forEach((option) => {options.push({label: option, value: option})})
+    props.headers.forEach((option) => {
+        if (props.intersection.includes(option)) {
+            options.push({label: option, value: option, disabled: true})
+        } else {
+            options.push({label: option, value: option})
+        }
+    })
 
     if (options.length === 0) {
         localization["selectSomeItems"] = "엑셀 2를 불러오세요"
